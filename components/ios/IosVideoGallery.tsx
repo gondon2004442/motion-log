@@ -33,9 +33,7 @@ const FIGMA_CATEGORY_ORDER = [
   "Micro interaction",
   "Navigation",
   "Transition",
-  "Morphing",
   "Loading",
-  "Appear",
   "Splash screen",
   "Promo",
 ] as const;
