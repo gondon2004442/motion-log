@@ -1,0 +1,32 @@
+{
+  "name": "animpreview",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "dev:lan": "next dev -H 0.0.0.0",
+    "build": "next build",
+    "start": "next start",
+    "start:lan": "next start -H 0.0.0.0",
+    "lint": "next lint",
+    "videos:optimize:ultra": "scripts\\optimize-videos.bat ultra",
+    "videos:optimize:balanced": "scripts\\optimize-videos.bat balanced"
+  },
+  "dependencies": {
+    "framer-motion": "^11.11.17",
+    "next": "14.2.20",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "shiki": "^1.24.2",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.10",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.16",
+    "typescript": "^5.7.2"
+  }
+}
