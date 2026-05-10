@@ -352,6 +352,133 @@ html[data-theme="light"] .iphone-home {
   cursor: pointer;
 }
 
+/* Figma frame: 1280 × 832 — pixel alignment vs design node 3245-3053 */
+@media (min-width: 1280px) {
+  :root {
+    --ml-design-w: 1280px;
+    --ml-design-h: 832px;
+    --ml-page-pad-x: 24px;
+    --ml-layout-gap: 32px;
+    --ml-col-sidebar: 260px;
+    --ml-col-feed: 356px;
+  }
+
+  .ml-page {
+    max-width: var(--ml-design-w);
+    margin-inline: auto;
+    padding: 12px var(--ml-page-pad-x) 0;
+    min-height: min(100dvh, var(--ml-design-h));
+    box-sizing: border-box;
+  }
+
+  .ml-header {
+    padding-top: 2px;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+  }
+
+  .ml-brand-image {
+    height: 36px;
+  }
+
+  .ml-info-btn {
+    font-size: 14px;
+    padding-top: 2px;
+  }
+
+  .ml-layout {
+    max-width: none;
+    width: 100%;
+    grid-template-columns: var(--ml-col-sidebar) var(--ml-col-feed) minmax(260px, 1fr);
+    gap: var(--ml-layout-gap);
+    align-items: start;
+    min-height: calc(var(--ml-design-h) - 72px);
+  }
+
+  .ml-sidebar {
+    position: sticky;
+    top: 12px;
+    height: calc(var(--ml-design-h) - 84px);
+    min-height: 0;
+    padding: 40px 0 16px;
+    justify-self: start;
+    width: var(--ml-col-sidebar);
+  }
+
+  .ml-categories {
+    position: relative;
+    top: 248px;
+    left: 0;
+    width: max-content;
+    min-height: 0;
+    gap: 14px;
+  }
+
+  .ml-category-item {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0;
+    gap: 6px;
+  }
+
+  .ml-category-caret {
+    width: 14px;
+    font-size: 11px;
+  }
+
+  .ml-theme-toggle {
+    bottom: 24px;
+    left: 0;
+  }
+
+  .ml-feed {
+    justify-self: center;
+    width: 100%;
+    max-width: var(--ml-col-feed);
+    min-height: calc(var(--ml-design-h) - 96px);
+    padding: 0 0 56px;
+    gap: 48px;
+  }
+
+  .iphone-shell {
+    width: min(276px, calc(100vw - 48px));
+    max-width: 276px;
+    border-radius: 32px;
+    padding: 9px 6px 12px;
+  }
+
+  .iphone-notch {
+    top: 7px;
+    width: 64px;
+    height: 7px;
+  }
+
+  .ios-video {
+    border-radius: 22px;
+  }
+
+  .ml-meta {
+    justify-self: start;
+    padding-left: 12px;
+    max-width: 420px;
+  }
+
+  .ml-meta h2 {
+    font-size: 64px;
+    line-height: 0.9;
+    letter-spacing: -0.014em;
+    max-width: 420px;
+  }
+
+  .ml-meta p {
+    margin-top: 8px;
+    font-size: 16px;
+    line-height: 1.25;
+    letter-spacing: 0;
+  }
+}
+
 @media (max-width: 900px) {
   .ml-page {
     padding: 12px;
