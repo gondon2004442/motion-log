@@ -13,6 +13,9 @@
   --phone-border: rgba(255, 255, 255, 0.08);
   --phone-shadow: 0 2px 4px rgba(0, 0, 0, 0.35), 0 24px 50px -12px rgba(0, 0, 0, 0.7);
   --meta: #d8d8d8;
+  /* Figma: SF Pro Display — web-safe stack (licensed SF is Apple-only). */
+  --font-ui-sans: -apple-system, blinkmacsystemfont, "SF Pro Text", "SF Pro Display",
+    "Segoe UI", roboto, "Helvetica Neue", arial, sans-serif;
 }
 
 html[data-theme="light"] {
@@ -24,6 +27,14 @@ html[data-theme="light"] {
   --phone-border: rgba(0, 0, 0, 0.12);
   --phone-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
   --meta: #2f2f2f;
+}
+
+html[data-theme="light"] .ml-category-item {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="light"] .ml-category-item.is-active {
+  color: var(--text);
 }
 
 body {
@@ -95,9 +106,18 @@ button {
 .ml-info-btn {
   background: transparent;
   border: none;
-  color: var(--muted);
-  font-size: 15px;
+  color: var(--text);
+  font-family: var(--font-ui-sans);
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
   cursor: pointer;
+}
+
+.ml-info-btn.is-active {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
 }
 
 .ml-layout {
@@ -108,6 +128,14 @@ button {
   align-items: start;
   max-width: 1600px;
   margin: 0 auto;
+}
+
+.ml-layout--info {
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 1fr);
+}
+
+.ml-layout--info .ml-meta {
+  display: none;
 }
 
 .ml-sidebar {
@@ -139,17 +167,17 @@ button {
   gap: 8px;
   border: none;
   background: transparent;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.5);
   cursor: pointer;
-  font-size: 27px;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Arial, sans-serif;
+  font-size: 16px;
+  font-family: var(--font-ui-sans);
   font-weight: 400;
   line-height: 1;
   letter-spacing: 0;
   text-align: left;
   padding: 0;
   border-radius: 0;
-  transition: color 120ms ease;
+  transition: color 120ms ease, font-weight 120ms ease;
   white-space: nowrap;
 }
 
@@ -162,7 +190,8 @@ button {
 }
 
 .ml-category-item.is-active {
-  color: var(--text);
+  color: #ffffff;
+  font-weight: 500;
 }
 
 .ml-category-item.is-active .ml-category-caret {
@@ -210,6 +239,91 @@ button {
   padding: 0 0 90px;
 }
 
+/* Info: chrome (header / sidebar / nav / theme) = gallery; only text column differs */
+.ml-page--info {
+  --ml-info-text-w: 520px;
+  --ml-info-text-gap: 32px;
+  --ml-info-stage-pad-top: 172px;
+}
+
+.ml-info-stage {
+  position: static;
+  align-self: start;
+  width: 100%;
+  max-width: var(--ml-info-text-w);
+  margin: 0;
+  padding: var(--ml-info-stage-pad-top) 0 48px 0;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.ml-info-article {
+  width: 100%;
+  max-width: var(--ml-info-text-w);
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-ui-sans);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1;
+  letter-spacing: 0;
+  color: #ffffff;
+  text-align: left;
+}
+
+.ml-info-article p {
+  margin: 0;
+}
+
+.ml-info-article p:nth-child(2),
+.ml-info-article p:nth-child(4) {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.ml-info-article p + p {
+  margin-top: var(--ml-info-text-gap);
+}
+
+.ml-info-muted {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ml-info-links {
+  margin-top: var(--ml-info-text-gap);
+  font-family: var(--font-ui-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.ml-info-link {
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+
+.ml-info-link:hover {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+html[data-theme="light"] .ml-info-article {
+  color: var(--text);
+}
+
+html[data-theme="light"] .ml-info-muted {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="light"] .ml-info-link {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme="light"] .ml-info-link:hover {
+  color: rgba(0, 0, 0, 0.72);
+}
+
 .ml-scene {
   width: 100%;
   display: flex;
@@ -219,8 +333,8 @@ button {
 }
 
 .iphone-shell {
-  width: min(292px, calc(100vw - 48px));
-  max-width: 292px;
+  width: min(244px, calc(100vw - 48px));
+  max-width: 244px;
   border-radius: 34px;
   background: linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0) 45%), linear-gradient(0deg, #0d0d0d, #141414);
   padding: 10px 7px 14px;
@@ -261,6 +375,34 @@ html[data-theme="light"] .iphone-shell {
   display: block;
   cursor: ew-resize;
 }
+
+@media (min-width: 901px) {
+  .iphone-shell {
+    height: 510px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .iphone-notch {
+    flex-shrink: 0;
+  }
+
+  .iphone-shell .ios-video-hitbox {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .iphone-shell .ios-video {
+    aspect-ratio: unset;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .iphone-home {
+    flex-shrink: 0;
+  }
+}
+
 .iphone-home {
   width: 40px;
   height: 3px;
@@ -287,21 +429,33 @@ html[data-theme="light"] .iphone-home {
 
 .ml-meta h2 {
   margin: 0;
-  color: var(--meta);
-  font-family: var(--font-serif), "Times New Roman", serif;
-  font-weight: 400;
-  font-size: clamp(66px, 4.35vw, 86px);
-  letter-spacing: -0.012em;
-  line-height: 0.92;
+  color: #ffffff;
+  font-family: var(--font-serif), ui-serif, Georgia, "Times New Roman", serif;
+  font-weight: 300;
+  font-size: clamp(40px, 3.2vw, 72px);
+  letter-spacing: 0;
+  line-height: 1.28;
   max-width: 500px;
   text-wrap: balance;
 }
 
-.ml-meta p {
+html[data-theme="light"] .ml-meta h2 {
+  color: var(--meta);
+}
+
+/* Figma node 1:41 — subtitle under display title */
+.ml-meta h2 + p {
   margin-top: 10px;
-  color: var(--muted);
-  font-size: clamp(20px, 1.25vw, 23px);
-  letter-spacing: -0.01em;
+  font-family: var(--font-ui-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0;
+}
+
+html[data-theme="light"] .ml-meta h2 + p {
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .ios-empty {
@@ -310,46 +464,6 @@ html[data-theme="light"] .iphone-home {
   place-items: center;
   text-align: center;
   color: var(--muted);
-}
-
-.ml-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: grid;
-  place-items: center;
-  z-index: 50;
-}
-
-.ml-modal {
-  width: min(520px, calc(100vw - 24px));
-  background: var(--panel);
-  color: var(--text);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 18px;
-}
-
-.ml-modal h3 {
-  margin: 0;
-  font-family: var(--font-serif), "Times New Roman", serif;
-  font-size: 28px;
-}
-
-.ml-modal p {
-  margin: 12px 0 0;
-  color: var(--muted);
-  line-height: 1.4;
-}
-
-.ml-modal-close {
-  margin-top: 14px;
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--text);
-  border-radius: 8px;
-  padding: 6px 12px;
-  cursor: pointer;
 }
 
 /* Figma frame: 1280 × 832 — pixel alignment vs design node 3245-3053 */
@@ -372,6 +486,8 @@ html[data-theme="light"] .iphone-home {
   }
 
   .ml-header {
+    width: min(1224px, 100%);
+    margin-inline: auto;
     padding-top: 2px;
     padding-bottom: 6px;
     margin-bottom: 8px;
@@ -382,7 +498,8 @@ html[data-theme="light"] .iphone-home {
   }
 
   .ml-info-btn {
-    font-size: 14px;
+    font-size: 16px;
+    font-weight: 500;
     padding-top: 2px;
   }
 
@@ -393,6 +510,22 @@ html[data-theme="light"] .iphone-home {
     gap: var(--ml-layout-gap);
     align-items: start;
     min-height: calc(var(--ml-design-h) - 72px);
+  }
+
+  .ml-page--info {
+    --ml-info-text-w: 560px;
+    --ml-info-stage-pad-top: 220px;
+  }
+
+  .ml-layout--info {
+    grid-template-columns: var(--ml-col-sidebar) minmax(0, 1fr);
+    gap: var(--ml-layout-gap);
+    min-height: calc(var(--ml-design-h) - 72px);
+  }
+
+  .ml-info-stage {
+    padding-bottom: 40px;
+    max-width: var(--ml-info-text-w);
   }
 
   .ml-sidebar {
@@ -422,6 +555,10 @@ html[data-theme="light"] .iphone-home {
     gap: 6px;
   }
 
+  .ml-category-item.is-active {
+    font-weight: 500;
+  }
+
   .ml-category-caret {
     width: 14px;
     font-size: 11px;
@@ -442,8 +579,8 @@ html[data-theme="light"] .iphone-home {
   }
 
   .iphone-shell {
-    width: min(276px, calc(100vw - 48px));
-    max-width: 276px;
+    width: min(244px, calc(100vw - 48px));
+    max-width: 244px;
     border-radius: 32px;
     padding: 9px 6px 12px;
   }
@@ -465,21 +602,26 @@ html[data-theme="light"] .iphone-home {
   }
 
   .ml-meta h2 {
-    font-size: 64px;
-    line-height: 0.9;
-    letter-spacing: -0.014em;
+    font-size: 40px;
+    line-height: 1.28;
+    letter-spacing: 0;
     max-width: 420px;
   }
 
-  .ml-meta p {
-    margin-top: 8px;
+  .ml-meta h2 + p {
+    margin-top: 10px;
     font-size: 16px;
-    line-height: 1.25;
+    line-height: 1;
     letter-spacing: 0;
   }
 }
 
 @media (max-width: 900px) {
+  .iphone-shell {
+    height: auto;
+    display: block;
+  }
+
   .ml-page {
     padding: 12px;
     border-bottom: none;
@@ -527,5 +669,20 @@ html[data-theme="light"] .iphone-home {
   .ml-meta h2 {
     max-width: 100%;
     font-size: clamp(30px, 9vw, 48px);
+  }
+
+  .ml-layout--info {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .ml-info-stage {
+    padding: 16px 0 32px;
+    min-height: 0;
+    max-width: none;
+  }
+
+  .ml-info-article {
+    max-width: none;
   }
 }

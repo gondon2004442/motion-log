@@ -38,6 +38,10 @@ const FIGMA_CATEGORY_ORDER = [
   "Promo",
 ] as const;
 
+function normalizeLabel(v: string) {
+  return v.toLowerCase().replace(/[^a-z]/g, "");
+}
+
 function HoverScrubVideo({ src }: { src: string }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const targetProgressRef = useRef<number>(0);
@@ -102,7 +106,7 @@ function HoverScrubVideo({ src }: { src: string }) {
     }
   };
 
-  useEffect(() => stopLoop, []);
+  useEffect(() => () => stopLoop(), []);
 
   return (
     <div
@@ -181,9 +185,8 @@ export default function IosVideoGallery({ categories }: Props) {
   const refs = useRef<Record<string, HTMLElement | null>>({});
 
   const menu = useMemo(() => {
-    const normalize = (v: string) => v.toLowerCase().replace(/[^a-z]/g, "");
     const byLabel = new Map(
-      categories.map((c) => [normalize(c.label), c] as const)
+      categories.map((c) => [normalizeLabel(c.label), c] as const)
     );
     const iosFallback =
       byLabel.get("ios") ||
@@ -191,7 +194,7 @@ export default function IosVideoGallery({ categories }: Props) {
       categories[0];
 
     return FIGMA_CATEGORY_ORDER.map((label) => {
-      const key = normalize(label);
+      const key = normalizeLabel(label);
       const match = byLabel.get(key);
       if (match) {
         return { slug: match.slug, label, videos: match.videos };
@@ -240,11 +243,11 @@ export default function IosVideoGallery({ categories }: Props) {
   }, [videos, activeVideoId]);
 
   useEffect(() => {
-    if (!videos.length) return;
+    if (showInfo || !videos.length) return;
     // Keep only active card warm to reduce decoder pressure.
     for (const v of videos) {
       const wrap = refs.current[v.id];
-      if (!wrap) continue;
+      if (!wrap?.isConnected) continue;
       const el = wrap.querySelector("video") as HTMLVideoElement | null;
       if (!el) continue;
       if (v.id === activeVideoId) {
@@ -254,10 +257,28 @@ export default function IosVideoGallery({ categories }: Props) {
         el.preload = "metadata";
       }
     }
-  }, [videos, activeVideoId]);
+  }, [videos, activeVideoId, showInfo]);
 
   useEffect(() => {
-    if (!videos.length) return;
+    if (!showInfo) return;
+    for (const wrap of Object.values(refs.current)) {
+      const el = wrap?.querySelector("video") as HTMLVideoElement | null;
+      el?.pause();
+    }
+    refs.current = {};
+  }, [showInfo]);
+
+  useEffect(() => {
+    if (!showInfo) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowInfo(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [showInfo]);
+
+  useEffect(() => {
+    if (!videos.length || showInfo) return;
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
@@ -275,20 +296,30 @@ export default function IosVideoGallery({ categories }: Props) {
       if (el) observer.observe(el);
     }
     return () => observer.disconnect();
-  }, [videos]);
+  }, [videos, showInfo]);
+
+  const goToCategory = (slug: string) => {
+    setSelectedCategory(slug);
+    setShowInfo(false);
+  };
 
   return (
-    <div className="ml-page">
+    <div className={`ml-page${showInfo ? " ml-page--info" : ""}`}>
       <header className="ml-header">
         <Brand theme={theme} />
-        <button className="ml-info-btn" onClick={() => setShowInfo(true)}>
+        <button
+          type="button"
+          className={`ml-info-btn${showInfo ? " is-active" : ""}`}
+          onClick={() => setShowInfo((open) => !open)}
+          aria-expanded={showInfo}
+        >
           Info
         </button>
       </header>
 
-      <main className="ml-layout">
+      <main className={`ml-layout${showInfo ? " ml-layout--info" : ""}`}>
         <aside className="ml-sidebar">
-          <nav className="ml-categories">
+          <nav className="ml-categories" aria-label="Categories">
             {menu.map((category) => (
               <button
                 key={category.slug}
@@ -296,7 +327,7 @@ export default function IosVideoGallery({ categories }: Props) {
                 className={`ml-category-item ${
                   category.slug === selectedCategory ? "is-active" : ""
                 }`}
-                onClick={() => setSelectedCategory(category.slug)}
+                onClick={() => goToCategory(category.slug)}
               >
                 <span className="ml-category-caret">▸</span>
                 <span>{category.label}</span>
@@ -326,8 +357,65 @@ export default function IosVideoGallery({ categories }: Props) {
           </button>
         </aside>
 
-        <section className="ml-feed">
-          {videos.length === 0 ? (
+        <section
+          className={showInfo ? "ml-info-stage" : "ml-feed"}
+          key={showInfo ? "info-view" : "feed-view"}
+        >
+          {showInfo ? (
+            <article className="ml-info-article">
+              <p>
+                Motion Log is an educational project curated by{" "}
+                <span className="ml-info-muted">Sergei Diuzhev</span>, interaction designer and
+                product design lead.
+              </p>
+              <p>
+                This library presents a curated collection of interface animations, transitions,
+                and gestures — captured and organized by categories. The goal is to provide designers
+                with a tool to observe microinteractions in detail, understand motion logic, and get
+                inspired by real-world product design examples.
+              </p>
+              <p>
+                All animations are recorded from live products and displayed in an interactive viewer
+                that lets you scrub through the motion smoothly, frame by frame.
+              </p>
+              <p>
+                <span className="ml-info-muted">Sergei Diuzhev</span> is a digital product designer
+                focused on emotional branding and interface animation. He collaborates with design
+                studios and startups to turn interfaces into expressive, memorable experiences.
+              </p>
+              <p className="ml-info-links">
+                <a
+                  href="https://www.instagram.com/srzh_dzhv?igsh=MXZsOTV2amZ4NXhjaQ%3D%3D&utm_source=qr"
+                  className="ml-info-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                >
+                  Instagram
+                </a>
+                <span className="ml-info-links-sep">, </span>
+                <a
+                  href="https://www.linkedin.com/in/sergey-diuzhev-988b3aa7?utm_source=share_via&utm_content=profile&utm_medium=member_ios"
+                  className="ml-info-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                >
+                  LinkedIn
+                </a>
+                <span className="ml-info-links-sep">, </span>
+                <a
+                  href="https://serezhaok.com/"
+                  className="ml-info-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Website"
+                >
+                  Website
+                </a>
+              </p>
+            </article>
+          ) : videos.length === 0 ? (
             <section className="ios-empty">
               <h1>No videos found</h1>
               <p>
@@ -355,42 +443,28 @@ export default function IosVideoGallery({ categories }: Props) {
           )}
         </section>
 
-        <aside className="ml-meta">
-          {activeVideo ? (
-            <>
-              <h2>
-                {titleTop}
-                <br />
-                {titleBottom || ""}
-              </h2>
-              <p>
-                {activeVideo.os}
-                {currentCategory?.label ? `, ${currentCategory.label}` : ""}
-              </p>
-            </>
-          ) : (
-            <div className="ios-empty">
-              <h1>No videos found</h1>
-              <p>
-                Add files into <code>animpreview/public/animations</code> or <code>animpreview/анимации</code>.
-              </p>
-            </div>
-          )}
-        </aside>
+        {!showInfo ? (
+          <aside className="ml-meta">
+            {activeVideo ? (
+              <>
+                <h2>
+                  {titleTop}
+                  <br />
+                  {titleBottom || ""}
+                </h2>
+              </>
+            ) : (
+              <div className="ios-empty">
+                <h1>No videos found</h1>
+                <p>
+                  Add files into <code>animpreview/public/animations</code> or{" "}
+                  <code>animpreview/анимации</code>.
+                </p>
+              </div>
+            )}
+          </aside>
+        ) : null}
       </main>
-
-      {showInfo ? (
-        <div className="ml-modal-backdrop" onClick={() => setShowInfo(false)}>
-          <section className="ml-modal" onClick={(e) => e.stopPropagation()}>
-            <h3>Motion Log</h3>
-            <p>Catalog of UI animation references for product design and frontend implementation.</p>
-            <p>Use category list on the left and scrub videos by moving cursor over the screen.</p>
-            <button className="ml-modal-close" onClick={() => setShowInfo(false)}>
-              Close
-            </button>
-          </section>
-        </div>
-      ) : null}
     </div>
   );
 }
